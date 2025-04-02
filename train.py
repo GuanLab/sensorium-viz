@@ -170,9 +170,7 @@ def main(args):
         im_size=256, 
         embed_grids=32, 
         n_synthetic=args.num_synthetic,
-        use_real_data=True,
-        use_custom_split=args.use_custom_split,
-        use_custom_resp_norm=args.use_custom_resp_norm,
+        use_real_data=args.use_real_data,
     )
     sampler = DistributedSampler(
         dataset,
@@ -201,7 +199,7 @@ def main(args):
         response_grid_channels=3,
         response_dropout_prob=args.response_dropout_prob,
     )
-    state_dict = find_model("pretrained_models/DiT-XL-2-256x256.pt")
+    state_dict = find_model(args.ckpt)
     model.load_state_dict(state_dict, strict=False)
 
     # for finetune, only train the condition related parameters
@@ -331,9 +329,9 @@ if __name__ == "__main__":
     parser.add_argument("--mice", type=str, nargs="+", required=True)
     parser.add_argument("--results-dir", type=str, default="results")
     parser.add_argument("--exp-dir", type=str, default=None)
-    parser.add_argument("--use-custom-split", type=bool, default=False)
-    parser.add_argument("--use-custom-resp-norm", type=bool, default=False)
     parser.add_argument("--model", type=str, choices=list(DiT_models.keys()), default="DiT-XL/2")
+    parser.add_argument("--ckpt", type=str, default="DiT-XL-2-256x256.pt")
+    parser.add_argument("--use-real-data", type=bool, default=True)
     parser.add_argument("--response-dropout-prob", type=float, default=0.1)
     parser.add_argument("--num-synthetic", type=int, default=80000)
     parser.add_argument("--epochs", type=int, default=1400)

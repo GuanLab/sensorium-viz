@@ -51,9 +51,7 @@ class SensoriumDataset(Dataset):
                  im_size: int = 256, 
                  im_channels: int = 3, 
                  embed_grids: int = 32,
-                 use_real_data: bool = True, 
-                 use_custom_split: bool = False,
-                 use_custom_resp_norm: bool = False,
+                 use_real_data: bool = True,
                  n_synthetic: int = 40000):
         
         # self.split = split
@@ -66,12 +64,8 @@ class SensoriumDataset(Dataset):
         self.support_info = {mouse_id: {} for mouse_id in mouse_ids}
         for mouse_id in mouse_ids:
             # information for train-test split
-            if use_custom_split:
-                train_ids = np.load(os.path.join("data", mouse_id, "meta/trials/train.npy"))
-                self.support_info[mouse_id]["train_ids"] = train_ids
-            else:
-                tiers = np.load(os.path.join("data", mouse_id, "meta/trials/tiers.npy"))
-                self.support_info[mouse_id]["train_ids"] = np.where((tiers == "train") | (tiers == "validation"))[0]
+            tiers = np.load(os.path.join("data", mouse_id, "meta/trials/tiers.npy"))
+            self.support_info[mouse_id]["train_ids"] = np.where((tiers == "train") | (tiers == "validation"))[0]
 
             coco_images = os.listdir("coco_images")
             coco_images.remove("stats")  # exclude the stats directory
@@ -82,15 +76,7 @@ class SensoriumDataset(Dataset):
             self.support_info[mouse_id]["train_synthetic_ids"] = [fname.replace(".npy", "") for fname in coco_images]
             
             # information for data normalization based on SENSORIUM 2022
-            if use_custom_resp_norm:
-                train_responses = np.vstack(
-                    [np.load(os.path.join("data", mouse_id, "data/responses", f"{train_id}.npy")) for train_id in train_ids]
-                )
-                s = train_responses.std(axis=0)
-                print("Factor for response normalization based on input data:", s)
-            else:
-                s = np.load(os.path.join("data", mouse_id, "meta/statistics/responses/all/std.npy"))
-                print("Factor for response normalization SENSORIUM provided:", s)
+            s = np.load(os.path.join("data", mouse_id, "meta/statistics/responses/all/std.npy"))
             threshold = 0.01 * s.mean()
             idx = s > threshold
             response_precision = np.ones_like(s) / threshold
