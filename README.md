@@ -11,13 +11,7 @@ Please contact ([dengkw@umich.edu](mailto:dengkw@umich.edu) or [gyuanfan@umich.e
 
 ### Environment
 
-- With environment `.yml` file
-
-    ```bash
-    conda env create -f environment.yml
-    ```
-
-- Directly use `pip` or `conda` failed
+- Use `pip`. The installation time is typically less than 10 minutes.
 
     ```bash
     # Python >= 3.10.14
@@ -68,7 +62,8 @@ The following datasets and weights are shared on this [Google Drive](https://dri
 
 ## Train
 
-Here we show an example of training a model for a mouse. It will save the checkpoints every 10000 training steps. The first checkpoint will be saved at 80000 steps.
+Here we show an example of training a model for a mouse. It will save the checkpoints every 10000 training steps. The first checkpoint will be saved at 80000 steps. Each step may take about 1s for training on average.
+
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 torchrun --nnodes=1 --nproc_per_node=1 --master_port=29501 train.py \
@@ -87,10 +82,10 @@ CUDA_VISIBLE_DEVICES=0 torchrun --nnodes=1 --nproc_per_node=1 --master_port=2950
     --ckpt-every 10000
 ```
 
-To use multiple GPUs for data parallel:
+To use multiple GPUs for data parallelism:
 `CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --nnodes=1 --nproc_per_node=4 --master_port=29501 train.py ...`
 
-Fine-tune an existed model with only the synthetic data for cross-mice inference. For example, we have trained a model for mouse 21067 and want to fine-tune for mouse 23343:
+Fine-tune an existing model with only the synthetic data for cross-mice inference. For example, we have trained a model for mouse 21067 and want to fine-tune it for mouse 23343:
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 torchrun --nnodes=1 --nproc_per_node=1 --master_port=29501 train.py \
